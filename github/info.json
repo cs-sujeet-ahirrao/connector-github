@@ -1434,7 +1434,8 @@
           "editable": true,
           "visible": true,
           "type": "json",
-          "name": "other_fields"
+          "name": "other_fields",
+          "tooltip": "(Optional) Specify fields in the JSON format to be used as Search criteria (used to determine dynamic membership) fields or as link fields."
         }
       ]
     },
@@ -4789,8 +4790,8 @@
           "required": false,
           "editable": true,
           "type": "text",
-          "tooltip": "Specify the number that identifies the pull request",
-          "description": "(Optional) Specify the number that identifies the pull request."
+          "tooltip": "Specify the number that identifies the pull request. Note: If you provide a value for this parameter, there's no need to include any optional parameters for this operation, as they won't affect the filtering based on that parameter.",
+          "description": "(Optional) Specify the number that identifies the pull request. If you provide a value for this parameter, there's no need to include any optional parameters for this operation, as they won't affect the filtering based on that parameter."
         },
         {
           "title": "State",
@@ -5864,7 +5865,7 @@
           "visible": true,
           "required": false,
           "editable": true,
-          "type": "integer",
+          "type": "text",
           "tooltip": "Specify the SHA of the commit that needs a review",
           "description": "Specify the SHA of the commit that needs a review."
         },
@@ -6212,8 +6213,9 @@
           "required": false,
           "editable": true,
           "type": "text",
-          "tooltip": "Logins for Users to assign to this issue. NOTE: Only users with push access can set assignees for new issues. Assignees are silently dropped otherwise",
-          "description": "Logins for Users to assign to this issue. NOTE: Only users with push access can set assignees for new issues. Assignees are silently dropped otherwise."
+          "tooltip": "Specify the comma-separated list of logins for the Users to assign to this issue. NOTE: Only users with push access can set assignees for new issues. Assignees are silently dropped otherwise",
+          "description": "Specify the comma-separated list of logins for the Users to assign to this issue. NOTE: Only users with push access can set assignees for new issues. Assignees are silently dropped otherwise.",
+          "placeholder": "For ex: user1,user2 or [\"user1\",\"user2\"]"
         },
         {
           "title": "Milestone",
@@ -6222,8 +6224,9 @@
           "required": false,
           "editable": true,
           "type": "text",
-          "tooltip": "The number of the milestone to associate this issue with. NOTE: Only users with push access can set the milestone for new issues. The milestone is silently dropped otherwise",
-          "description": "Specify the number of the milestone to associate this issue with. NOTE: Only users with push access can set the milestone for new issues. The milestone is silently dropped otherwise."
+          "tooltip": "The number of the milestone to associate this issue with. NOTE: Only users with push access can set the milestone for new issues. The milestone is silently dropped otherwise. For ex: 1 or 2 or \"1\" or \"2\" or null.",
+          "description": "Specify the number of the milestone to associate this issue with. NOTE: Only users with push access can set the milestone for new issues. The milestone is silently dropped otherwise.",
+          "placeholder": "For ex: 1 or 2 or \"1\" or \"2\""
         },
         {
           "title": "Labels",
@@ -6232,7 +6235,7 @@
           "required": false,
           "editable": true,
           "type": "text",
-          "placeholder": "[\"lable1\",\"label2\"]",
+          "placeholder": "For ex: label1,label2 or [\"label1\",\"label2\"]",
           "tooltip": "Labels to associate with this issue. NOTE: Only users with push access can set labels for new issues. Labels are silently dropped otherwise",
           "description": "Labels to associate with this issue. NOTE: Only users with push access can set labels for new issues. Labels are silently dropped otherwise."
         }
@@ -6415,8 +6418,9 @@
           "required": false,
           "editable": true,
           "type": "text",
-          "tooltip": "If an integer is passed, it should refer to a milestone by its number field. If the string * is passed, issues with any milestone are accepted. If the string none is passed, issues without milestones are returned",
-          "description": "Specify a value for the milestone. If an integer is passed, it should refer to a milestone by its number field. If the string * is passed, issues with any milestone are accepted. If the string none is passed, issues without milestones are returned."
+          "tooltip": "If an integer is passed, it should refer to a milestone by its number field. If the string * is passed, issues with any milestone are accepted. If the string none is passed, issues without milestones are returned. For ex: 1 or 2 or \"1\" or \"2\" or null.",
+          "description": "Specify a value for the milestone. If an integer is passed, it should refer to a milestone by its number field. If the string * is passed, issues with any milestone are accepted. If the string none is passed, issues without milestones are returned.",
+          "placeholder": "For ex: 1 or 2 or \"1\" or \"2\""
         },
         {
           "title": "State",
@@ -6471,7 +6475,7 @@
           "required": false,
           "editable": true,
           "type": "text",
-          "placeholder": "[\"label1\", \"label\"]",
+          "placeholder": "For ex: label1,label2 or [\"label1\",\"label2\"]",
           "tooltip": "A list of comma separated label names. Example: bug,ui,@high",
           "description": "Specify a list of comma-separated label names. Example: bug,ui,@high."
         },
