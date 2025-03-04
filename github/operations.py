@@ -79,18 +79,6 @@ class GitHub(object):
             raise ConnectorError(str(err))
 
 
-def per_page_validation(per_page):
-    if per_page is None or per_page == "":
-        pass
-    else:
-        try:
-            per_page = int(per_page)
-        except ValueError:
-            raise ConnectorError('The Per Page value should be a valid integer.')
-        if per_page < 1 or per_page > 100:
-            raise ConnectorError('The Per Page value should be between 1 and 100, inclusive.')
-
-
 def create_repository(config, params, *args, **kwargs):
     github = GitHub(config)
     if params.get('other_fields'):
@@ -117,8 +105,6 @@ def create_repository_using_template(config, params, *args, **kwargs):
 
 def list_organization_repositories(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     params['type'] = params.get('type', '').lower()
     params['sort'] = (params.get('sort', '').lower()).replace(' ', '_')
     params['direction'] = params.get('direction', '').lower()
@@ -129,8 +115,6 @@ def list_organization_repositories(config, params, *args, **kwargs):
 
 def list_user_repositories(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     params['type'] = params.get('type', '').lower()
     params['sort'] = (params.get('sort', '').lower()).replace(' ', '_')
     params['direction'] = params.get('direction', '').lower()
@@ -141,8 +125,6 @@ def list_user_repositories(config, params, *args, **kwargs):
 
 def list_authenticated_user_repositories(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     params['visibility'] = params.get('visibility', '').lower()
     params['type'] = params.get('type', '').lower()
     params['sort'] = (params.get('sort', '').lower()).replace(' ', '_')
@@ -179,8 +161,6 @@ def fork_organization_repository(config, params, *args, **kwargs):
 
 def list_fork_repositories(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     params.pop('repo_type', '')
     params['sort'] = params.get('sort', '').lower()
     query_params = {k: v for k, v in params.items() if
@@ -214,8 +194,6 @@ def add_repository_collaborator(config, params, *args, **kwargs):
 
 def list_repository_collaborator(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     params['affiliation'] = params.get('affiliation', '').lower()
     params['permission'] = params.get('permission', '').lower()
     query_params = {k: v for k, v in params.items() if
@@ -253,8 +231,6 @@ def merge_branch(config, params, *args, **kwargs):
 
 def list_branches(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     query_params = {k: v for k, v in params.items() if
                     v is not None and v != '' and v != {} and v != [] and k not in ['owner', 'org', 'repo']}
     if query_params['protected'] is False:
@@ -465,8 +441,6 @@ def create_pull_request(config, params, *args, **kwargs):
 
 def list_pull_request(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     params['state'] = params.get('state', '').lower()
     params['sort'] = (params.get('sort', '').lower()).replace(' ', '-')
     params['direction'] = params.get('direction', '').lower()
@@ -510,8 +484,6 @@ def list_review_comments(config, params, *args, **kwargs):
 
 def list_pr_reviews(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     query_params = {k: v for k, v in params.items() if
                     v is not None and v != '' and v != {} and v != [] and k not in ['owner', 'org', 'repo',
                                                                                     'pull_number']}
@@ -551,8 +523,6 @@ def create_issue(config, params, *args, **kwargs):
 
 def list_repository_issue(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     params['state'] = params.get('state', '').lower()
     params['sort'] = params.get('sort', '').lower()
     params['direction'] = params.get('direction', '').lower()
@@ -597,8 +567,6 @@ def create_release(config, params, *args, **kwargs):
 
 def list_releases(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     query_params = {k: v for k, v in params.items() if
                     v is not None and v != '' and v != {} and v != [] and k not in ['owner', 'org', 'repo']}
     endpoint = '{0}/releases'.format(params.get('repo'))
@@ -608,8 +576,6 @@ def list_releases(config, params, *args, **kwargs):
 
 def list_stargazers(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     query_params = {k: v for k, v in params.items() if
                     v is not None and v != '' and v != {} and v != [] and k not in ['owner', 'org', 'repo']}
     endpoint = '{0}/stargazers'.format(params.get('repo'))
@@ -626,8 +592,6 @@ def star_repository(config, params, *args, **kwargs):
 
 def list_watchers(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     query_params = {k: v for k, v in params.items() if
                     v is not None and v != '' and v != {} and v != [] and k not in ['owner', 'org', 'repo']}
     endpoint = '{0}/subscribers'.format(params.get('repo'))
@@ -698,8 +662,6 @@ def delete_file_from_repository(config, params, *args, **kwargs):
 
 def search_code(config, params, *args, **kwargs):
     github = GitHub(config)
-    per_page = params.get('per_page')
-    per_page_validation(per_page)
     params['q'] = params.pop('query', '')
     payload = {k: v for k, v in params.items() if
                v is not None and v != '' and v != {} and v != []}

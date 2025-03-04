@@ -1061,22 +1061,6 @@
       ],
       "parameters": [
         {
-          "title": "Visibility",
-          "name": "visibility",
-          "visible": true,
-          "required": false,
-          "editable": true,
-          "type": "select",
-          "options": [
-            "All",
-            "Public",
-            "Private"
-          ],
-          "value": "All",
-          "tooltip": "Select from the following options to specify the visibility of the repositories to be fetched",
-          "description": "(Optional) Select from the following options to specify the visibility of the repositories to be fetched. All, Public, Private"
-        },
-        {
           "title": "Affiliation",
           "name": "affiliation",
           "visible": true,
@@ -1137,6 +1121,22 @@
           "value": "Desc",
           "tooltip": "Select the property to sort the direction of the results returned by this operation.",
           "description": "Select the property to sort the direction of the results returned by this operation. You can choose from the following options: Asc: Sort in ascending order Desc: Sort in descending order"
+        },
+        {
+          "title": "Visibility",
+          "name": "visibility",
+          "visible": true,
+          "required": false,
+          "editable": true,
+          "type": "select",
+          "options": [
+            "All",
+            "Public",
+            "Private"
+          ],
+          "value": "All",
+          "tooltip": "Select from the following options to specify the visibility of the repositories to be fetched",
+          "description": "(Optional) Select from the following options to specify the visibility of the repositories to be fetched. All, Public, Private"
         },
         {
           "title": "Updated After",
@@ -6777,8 +6777,9 @@
           "required": false,
           "editable": true,
           "type": "text",
-          "tooltip": "The number of the milestone to associate this issue with or null to remove current.",
-          "description": "Specify the number of the milestone to associate this issue with or null to remove the current."
+          "tooltip": "The number of the milestone to associate this issue with or null to remove current. For ex: 1 or 2 or \"1\" or \"2\" or null.",
+          "description": "Specify the number of the milestone to associate this issue with or null to remove the current.",
+          "placeholder": "For ex: 1 or 2 or \"1\" or \"2\""
         },
         {
           "title": "Labels",
