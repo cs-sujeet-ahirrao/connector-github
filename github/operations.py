@@ -130,7 +130,7 @@ def list_authenticated_user_repositories(config, params, *args, **kwargs):
     params['sort'] = (params.get('sort', '').lower()).replace(' ', '_')
     params['direction'] = params.get('direction', '').lower()
     query_params = {k: v for k, v in params.items() if v is not None and v != '' and v != {} and v != []}
-    return github.make_request(params=query_params, endpoint='users/repos')
+    return github.make_request(params=query_params, endpoint='user/repos')
 
 
 def update_repository(config, params, *args, **kwargs):
@@ -274,6 +274,13 @@ def clone_repository(config, params, *args, **kwargs):
                                                                                        response.text if response.text else response.content))
             raise ConnectorError("Error occurred: {{\"status_code\": {0}, Error: {1}}}".format(response.status_code,
                                                                                                response.text if response.text else response.content))
+        if os.path.exists(zip_file):
+            # If it's a file, delete it
+            if os.path.isfile(zip_file):
+                os.remove(zip_file)
+            # If it's a folder, delete it and its contents
+            elif os.path.isdir(zip_file):
+                shutil.rmtree(zip_file)
         with open(zip_file, "wb") as zipFile:
             zipFile.write(response.content)
         if params.get('clone_zip') is True:

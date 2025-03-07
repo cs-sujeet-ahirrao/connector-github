@@ -9,7 +9,7 @@
   "category": "Source Code Management",
   "icon_small_name": "small.png",
   "icon_large_name": "large.png",
-  "help_online": "",
+  "help_online": "https://docs.fortinet.com/document/fortisoar/2.0.0/github/1036/github-v2-0-0",
   "configuration": {
     "fields": [
       {
@@ -19,8 +19,8 @@
         "visible": true,
         "type": "select",
         "name": "github_account",
-        "description": "Select the option used to access the GitHub server to connect and perform the automated operations.",
-        "tooltip": "Select the option used to access the GitHub server to connect and perform the automated operations.",
+        "description": "Select the option used to access the GitHub server to connect and perform the automated operations. You can choose from the following options: GitHub Cloud or GitHub Enterprise.",
+        "tooltip": "Select the option used to access the GitHub server to connect and perform the automated operations. You can choose from the following options: GitHub Cloud or GitHub Enterprise.",
         "options": [
           "GitHub Cloud",
           "GitHub Enterprise"
@@ -35,8 +35,8 @@
               "type": "text",
               "name": "server_url",
               "value": "https://api.github.com",
-              "description": "Specify the URL of the GitHub server to connect and perform automated operations.",
-              "tooltip": "Specify the URL of the GitHub server to connect and perform automated operations"
+              "description": "Select to auto-populate the Server API URL field with the default GitHub Cloud URL.",
+              "tooltip": "Select to auto-populate the Server API URL field with the default GitHub Cloud URL."
             }
           ],
           "GitHub Enterprise": [
@@ -47,8 +47,8 @@
               "visible": true,
               "type": "text",
               "name": "server_url",
-              "description": "Specify the URL of the GitHub server to connect and perform automated operations.",
-              "tooltip": "Specify the URL of the GitHub server to connect and perform automated operations"
+              "description": "Select to specify the GitHub Enterprise URL in the Server API URL field.",
+              "tooltip": "Select to specify the GitHub Enterprise URL in the Server API URL field."
             }
           ]
         }
@@ -77,8 +77,8 @@
         "title": "Verify SSL",
         "name": "verify_ssl",
         "type": "checkbox",
-        "description": "Specifies whether the SSL certificate for the server is to be verified. By default, this option is set to True.",
-        "tooltip": "Specifies whether the SSL certificate for the server is to be verified or not.",
+        "description": "Specifies whether the SSL certificate for the server is to be verified. By default, this option is selected, i.e., set to true.",
+        "tooltip": "Specifies whether the SSL certificate for the server is to be verified. By default, this option is selected, i.e., set to true.",
         "required": false,
         "editable": true,
         "visible": true,
@@ -1064,63 +1064,13 @@
           "title": "Affiliation",
           "name": "affiliation",
           "visible": true,
-          "required": true,
+          "required": false,
           "editable": true,
           "type": "text",
           "placeholder": "owner,collaborator,organization_member",
           "value": "owner,collaborator,organization_member",
           "tooltip": "Specify a comma-separated list of values from the owner,collaborator,organization_member",
           "description": "Specify a comma-separated list of values from the following options: owner: Repositories that are owned by the authenticated user. collaborator: Repositories that the user has been added to as a collaborator. organization_member: Repositories that the user has access to through being a member of an organization. This includes every repository on every team that the user is on."
-        },
-        {
-          "title": "Repository Type",
-          "name": "type",
-          "visible": true,
-          "required": true,
-          "editable": true,
-          "type": "select",
-          "options": [
-            "All",
-            "Owner",
-            "Public",
-            "Private",
-            "Member"
-          ],
-          "value": "All",
-          "tooltip": "Select the type of repository you want to retrieve from GitHub. The repository type limits the results to the repositories you have selected.",
-          "description": "Select the type of repository you want to retrieve from GitHub. The repository type limits the results to the repositories you have selected. You can choose from the following options: All, Owner, Public, Private, Member"
-        },
-        {
-          "title": "Sort",
-          "name": "sort",
-          "visible": true,
-          "required": true,
-          "editable": true,
-          "type": "select",
-          "options": [
-            "Created",
-            "Updated",
-            "Pushed",
-            "Full Name"
-          ],
-          "value": "Full Name",
-          "tooltip": "Select the property to sort the results returned by this operation.",
-          "description": "Select the property to sort the results returned by this operation. You can choose from the following options: Created, Updated, Pushed, Full Name"
-        },
-        {
-          "title": "Direction",
-          "name": "direction",
-          "visible": true,
-          "required": true,
-          "editable": true,
-          "type": "select",
-          "options": [
-            "Asc",
-            "Desc"
-          ],
-          "value": "Desc",
-          "tooltip": "Select the property to sort the direction of the results returned by this operation.",
-          "description": "Select the property to sort the direction of the results returned by this operation. You can choose from the following options: Asc: Sort in ascending order Desc: Sort in descending order"
         },
         {
           "title": "Visibility",
@@ -1137,6 +1087,55 @@
           "value": "All",
           "tooltip": "Select from the following options to specify the visibility of the repositories to be fetched",
           "description": "(Optional) Select from the following options to specify the visibility of the repositories to be fetched. All, Public, Private"
+        },
+        {
+          "title": "Repository Type",
+          "name": "type",
+          "visible": true,
+          "required": false,
+          "editable": true,
+          "type": "select",
+          "options": [
+            "All",
+            "Owner",
+            "Public",
+            "Private",
+            "Member"
+          ],
+          "tooltip": "Select the type of repository you want to retrieve from GitHub. The repository type limits the results to the repositories you have selected. Note: Will cause a 422 error if used in the same request as Visibility or Affiliation.",
+          "description": "Select the type of repository you want to retrieve from GitHub. The repository type limits the results to the repositories you have selected. You can choose from the following options: All, Owner, Public, Private, Member"
+        },
+        {
+          "title": "Sort",
+          "name": "sort",
+          "visible": true,
+          "required": false,
+          "editable": true,
+          "type": "select",
+          "options": [
+            "Created",
+            "Updated",
+            "Pushed",
+            "Full Name"
+          ],
+          "value": "Full Name",
+          "tooltip": "Select the property to sort the results returned by this operation.",
+          "description": "Select the property to sort the results returned by this operation. You can choose from the following options: Created, Updated, Pushed, Full Name"
+        },
+        {
+          "title": "Direction",
+          "name": "direction",
+          "visible": true,
+          "required": false,
+          "editable": true,
+          "type": "select",
+          "options": [
+            "Asc",
+            "Desc"
+          ],
+          "value": "Desc",
+          "tooltip": "Select the property to sort the direction of the results returned by this operation.",
+          "description": "Select the property to sort the direction of the results returned by this operation. You can choose from the following options: Asc: Sort in ascending order Desc: Sort in descending order"
         },
         {
           "title": "Updated After",
@@ -1435,7 +1434,15 @@
           "visible": true,
           "type": "json",
           "name": "other_fields",
-          "tooltip": "(Optional) Specify fields in the JSON format to be used as Search criteria (used to determine dynamic membership) fields or as link fields."
+          "tooltip": "(Optional) Specify fields in the JSON format to be used as Search criteria (used to determine dynamic membership) fields or as link fields.",
+          "value": {
+            "is_template": false,
+            "allow_squash_merge": true,
+            "allow_merge_commit": true,
+            "allow_rebase_merge": true,
+            "delete_branch_on_merge": false,
+            "allow_update_branch": false
+          }
         }
       ]
     },
@@ -2062,7 +2069,7 @@
           "required": false,
           "editable": true,
           "type": "text",
-          "tooltip": "Specify the blob SHA of the file being replaced. Required if you are updating a file",
+          "tooltip": "Specify the blob SHA of the file being replaced. Required if you are updating a file. Note: The SHA value should be obtained from the response of the \"GET FILE\" operation.",
           "description": "(Optional) Specify the blob SHA of the file being replaced. Required if you are updating a file."
         }
       ]
@@ -2300,7 +2307,7 @@
           "required": true,
           "editable": true,
           "type": "text",
-          "tooltip": "Specify the blob SHA of the file being deleted.",
+          "tooltip": "Specify the blob SHA of the file being deleted. Note: The SHA value should be obtained from the response of the \"GET FILE\" operation.",
           "description": "Specify the blob SHA of the file being deleted."
         },
         {
@@ -7596,8 +7603,8 @@
           "editable": true,
           "type": "checkbox",
           "value": true,
-          "tooltip": "Select this option to receive notifications from the specified repository",
-          "description": "Select this option to receive notifications from the specified repository."
+          "tooltip": "Select this option to receive notifications from the specified repository. Note: Both \"Subscribed\" and \"Ignored\" cannot be set to true at the same time. You can either set \"Subscribed\" to true and \"Ignored\" to false, or \"Subscribed\" to false and \"Ignored\" to true. If both are set to false, the result will show \"Subscribed\" as true and \"Ignored\" as false.",
+          "description": "Select this option to receive notifications from the specified repository. Note: Both \"Subscribed\" and \"Ignored\" cannot be set to true at the same time. You can either set \"Subscribed\" to true and \"Ignored\" to false, or \"Subscribed\" to false and \"Ignored\" to true. If both are set to false, the result will show \"Subscribed\" as true and \"Ignored\" as false."
         },
         {
           "title": "Ignored",
@@ -7606,9 +7613,9 @@
           "required": false,
           "editable": true,
           "type": "checkbox",
-          "value": true,
-          "tooltip": "Select this option to block notifications from the specified repository",
-          "description": "Select this option to block notifications from the specified repository."
+          "value": false,
+          "tooltip": "Select this option to block notifications from the specified repository. Note: Both \"Subscribed\" and \"Ignored\" cannot be set to true at the same time. You can either set \"Subscribed\" to true and \"Ignored\" to false, or \"Subscribed\" to false and \"Ignored\" to true. If both are set to false, the result will show \"Subscribed\" as true and \"Ignored\" as false.",
+          "description": "Select this option to block notifications from the specified repository. Note: Both \"Subscribed\" and \"Ignored\" cannot be set to true at the same time. You can either set \"Subscribed\" to true and \"Ignored\" to false, or \"Subscribed\" to false and \"Ignored\" to true. If both are set to false, the result will show \"Subscribed\" as true and \"Ignored\" as false."
         }
       ]
     },
