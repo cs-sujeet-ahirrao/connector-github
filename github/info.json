@@ -21,6 +21,7 @@
         "name": "github_account",
         "description": "Select the option used to access the GitHub server to connect and perform the automated operations. You can choose from the following options: GitHub Cloud or GitHub Enterprise.",
         "tooltip": "Select the option used to access the GitHub server to connect and perform the automated operations. You can choose from the following options: GitHub Cloud or GitHub Enterprise.",
+        "value": "GitHub Cloud",
         "options": [
           "GitHub Cloud",
           "GitHub Enterprise"
