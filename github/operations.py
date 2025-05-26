@@ -63,8 +63,10 @@ class GitHub(object):
                 return
             elif response.ok:
                 return response.json()
+            elif response.status_code == 404:
+                return response.json()
             else:
-                logger.error(response.text)
+                logger.error("Response: {0}".format(response.text))
                 raise ConnectorError({'status_code': response.status_code, 'message': response.text})
         except requests.exceptions.SSLError:
             raise ConnectorError('SSL certificate validation failed')
@@ -101,6 +103,17 @@ def create_repository_using_template(config, params, *args, **kwargs):
     return github.make_request(
         endpoint='repos/{0}/{1}/generate'.format(params.get('template_owner'), params.get('template_repo')),
         method='POST', data=json.dumps(payload))
+
+
+def get_repository(config, params, *args, **kwargs):
+    github = GitHub(config)
+    if params.get('repo_type') == 'Organization':
+        endpoint = '{0}'.format(params.get('repo'))
+    else:
+        endpoint = '{0}'.format(params.get('repo'))
+    response = github.make_request(endpoint=endpoint, org=params.get('org'), owner=params.get('owner'))
+    logger.error("Response: {0}".format(response))
+    return response
 
 
 def list_organization_repositories(config, params, *args, **kwargs):
@@ -679,6 +692,7 @@ def search_code(config, params, *args, **kwargs):
 operations = {
     'create_repository': create_repository,
     'create_repository_using_template': create_repository_using_template,
+    'get_repository': get_repository,
     'list_organization_repositories': list_organization_repositories,
     'list_user_repositories': list_user_repositories,
     'list_authenticated_user_repositories': list_authenticated_user_repositories,
