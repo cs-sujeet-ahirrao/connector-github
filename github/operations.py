@@ -107,10 +107,7 @@ def create_repository_using_template(config, params, *args, **kwargs):
 
 def get_repository(config, params, *args, **kwargs):
     github = GitHub(config)
-    if params.get('repo_type') == 'Organization':
-        endpoint = '{0}'.format(params.get('repo'))
-    else:
-        endpoint = '{0}'.format(params.get('repo'))
+    endpoint = '{0}'.format(params.get('repo'))
     response = github.make_request(endpoint=endpoint, org=params.get('org'), owner=params.get('owner'))
     logger.error("Response: {0}".format(response))
     return response
