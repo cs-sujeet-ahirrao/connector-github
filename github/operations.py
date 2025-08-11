@@ -397,14 +397,15 @@ def update_clone_repository(config, params, *args, **kwargs):
         return {'status': 'finish'}
     except Exception as err:
         raise ConnectorError(err)
-    
+
 
 def push_repository(config, params, *args, **kwargs):
+    # Authentication
     token = config.get('password')
     github = GitHub(config)
     g = Github(token, base_url=github.server_url.strip("/"), verify=github.verify_ssl)
 
-    # Get repo
+    # Get repository object
     if params.get('repo_type') == 'Organization':
         repo = g.get_organization(params.get('org')).get_repo(params.get('name'))
     else:
@@ -412,28 +413,20 @@ def push_repository(config, params, *args, **kwargs):
 
     # Parameters
     root_path = params.get('clone_path')
+    branch = params.get('branch', 'main')
     commit_message = params.get('commit_message', 'Update files')
     commit_description = params.pop('commit_description', '')
     if commit_description:
         commit_message += '\n' + commit_description
-    branch = params.get('branch', 'main')
 
     # Get current commit/tree
-    master_ref = repo.get_git_ref('heads/' + branch)
+    try:
+        master_ref = repo.get_git_ref(f'heads/{branch}')
+    except Exception as e:
+        raise ConnectorError(f"Failed to fetch branch '{branch}': {e}")
+    
     master_sha = master_ref.object.sha
     base_tree = repo.get_git_tree(master_sha, recursive=True)
-
-    # Prepare local files
-    file_list = []
-    local_paths = set()
-    for root, dirs, files in os.walk(root_path):
-        for f in files:
-            full_path = os.path.join(root, f)
-            if any(x in full_path for x in ['.DS_Store', '.git']):
-                continue
-            file_list.append(full_path)
-            rel_path = os.path.relpath(full_path, root_path)
-            local_paths.add(rel_path)
 
     # Get all remote files
     def get_all_files_from_tree(tree):
@@ -446,40 +439,63 @@ def push_repository(config, params, *args, **kwargs):
     remote_files = get_all_files_from_tree(base_tree)
     remote_paths = set(remote_files.keys())
 
-    # Build git tree elements
+    # Collect and read local files
     element_list = []
+    local_paths = set()
 
     try:
-        for entry in file_list:
-            rel_path = os.path.relpath(entry, root_path)
-            if entry.endswith('.png'):
-                with open(entry, 'rb') as input_file:
-                    data = b64encode(input_file.read()).decode()
-            else:
-                with open(entry, 'r', encoding='utf-8', errors='ignore') as input_file:
-                    data = input_file.read()
+        for root, dirs, files in os.walk(root_path):
+            for f in files:
+                full_path = os.path.join(root, f)
 
-            element = InputGitTreeElement(rel_path, '100644', 'blob', content=data)
-            element_list.append(element)
+                # Skip ignored files
+                if any(skip in full_path for skip in ['.DS_Store', '.git']):
+                    continue
+
+                # Relative path from root directory
+                rel_path = os.path.relpath(full_path, root_path)
+                local_paths.add(rel_path)
+
+                # Read file content
+                if rel_path.endswith('.png'):  # or any other binary extension
+                    with open(full_path, 'rb') as input_file:
+                        data = b64encode(input_file.read()).decode()
+                else:
+                    with open(full_path, 'r', encoding='utf-8', errors='ignore') as input_file:
+                        data = input_file.read()
+
+                element = InputGitTreeElement(
+                    path=rel_path,
+                    mode='100644',
+                    type='blob',
+                    content=data
+                )
+                element_list.append(element)
     except Exception as err:
         raise ConnectorError(f"Error reading files: {err}")
 
-    # Identify deleted files
-    deleted_files = remote_paths - local_paths
-    for path in deleted_files:
-        # Mark file for deletion using sha=None is invalid — instead, skip for now or use delete_file API
-        print(f"Skipping deletion of remote file: {path}")
+    # Detect deleted files
+    files_to_delete = remote_paths - local_paths
+    for file_path in files_to_delete:
+        element = InputGitTreeElement(path=file_path, mode='100644', type='blob', sha=None)
+        element_list.append(element)
 
-    # Safeguard: No changes to commit
+    # No changes safeguard
     if not element_list:
         return {"status": "no changes to commit"}
 
-    # Create commit and update reference
-    tree = repo.create_git_tree(element_list, base_tree)
+    # Create and commit
+    new_tree = repo.create_git_tree(element_list, base_tree)
     parent = repo.get_git_commit(master_sha)
-    commit = repo.create_git_commit(commit_message, tree, [parent])
+    commit = repo.create_git_commit(commit_message, new_tree, [parent])
     master_ref.edit(commit.sha)
-    return {"status": "finished", "commit": commit.sha}
+
+    return {
+        "status": "finished",
+        "commit_sha": commit.sha,
+        "files_added_or_updated": list(local_paths),
+        "files_deleted": list(files_to_delete)
+    }
 
 
 def create_pull_request(config, params, *args, **kwargs):
