@@ -3372,6 +3372,570 @@
       ]
     },
     {
+      "operation": "get_commit",
+      "title": "Get Commit",
+      "description": "Retrieves the contents of a single commit reference. The commit reference can be a commit SHA, branch name, or tag name, and other input parameters you have specified",
+      "category": "investigation",
+      "annotation": "get_commit",
+      "enabled": true,
+      "output_schema": {
+        "sha": "",
+        "node_id": "",
+        "commit": {
+          "author": {
+            "name": "",
+            "email": "",
+            "date": ""
+          },
+          "committer": {
+            "name": "",
+            "email": "",
+            "date": ""
+          },
+          "message": "",
+          "tree": {
+            "sha": "",
+            "url": ""
+          },
+          "url": "",
+          "comment_count": "",
+          "verification": {
+            "verified": "",
+            "reason": "",
+            "signature": "",
+            "payload": "",
+            "verified_at": ""
+          }
+        },
+        "url": "",
+        "html_url": "",
+        "comments_url": "",
+        "author": {
+          "login": "",
+          "id": "",
+          "node_id": "",
+          "avatar_url": "",
+          "gravatar_id": "",
+          "url": "",
+          "html_url": "",
+          "followers_url": "",
+          "following_url": "",
+          "gists_url": "",
+          "starred_url": "",
+          "subscriptions_url": "",
+          "organizations_url": "",
+          "repos_url": "",
+          "events_url": "",
+          "received_events_url": "",
+          "type": "",
+          "user_view_type": "",
+          "site_admin": ""
+        },
+        "committer": {
+          "login": "",
+          "id": "",
+          "node_id": "",
+          "avatar_url": "",
+          "gravatar_id": "",
+          "url": "",
+          "html_url": "",
+          "followers_url": "",
+          "following_url": "",
+          "gists_url": "",
+          "starred_url": "",
+          "subscriptions_url": "",
+          "organizations_url": "",
+          "repos_url": "",
+          "events_url": "",
+          "received_events_url": "",
+          "type": "",
+          "user_view_type": "",
+          "site_admin": ""
+        },
+        "parents": [
+          {
+            "sha": "",
+            "url": "",
+            "html_url": ""
+          }
+        ],
+        "stats": {
+          "total": "",
+          "additions": "",
+          "deletions": ""
+        },
+        "files": [
+          {
+            "sha": "",
+            "filename": "",
+            "status": "",
+            "additions": "",
+            "deletions": "",
+            "changes": "",
+            "blob_url": "",
+            "raw_url": "",
+            "contents_url": "",
+            "patch": ""
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "title": "Repository Type",
+          "name": "repo_type",
+          "visible": true,
+          "required": true,
+          "editable": true,
+          "type": "select",
+          "options": [
+            "Organization",
+            "User"
+          ],
+          "onchange": {
+            "Organization": [
+              {
+                "title": "Organization Name",
+                "name": "org",
+                "visible": true,
+                "required": true,
+                "editable": true,
+                "type": "text",
+                "tooltip": "Specify the name of the organization on GitHub, of the repository whose repository branche commit details are to be listed, in the Organization Name field.",
+                "description": "Specify the name of the organization on GitHub, of the repository whose repository branche commit details are to be listed, in the Organization Name field."
+              }
+            ],
+            "User": [
+              {
+                "title": "Repository Owner",
+                "name": "owner",
+                "visible": true,
+                "required": true,
+                "editable": true,
+                "type": "text",
+                "tooltip": "Specify the name of the repository owner on GitHub, of the repository whose repository branche commit details are to be listed, in the Repository Owner field.",
+                "description": "Specify the name of the repository owner on GitHub, of the repository whose repository branche commit details are to be listed, in the Repository Owner field."
+              }
+            ]
+          },
+          "tooltip": "Select the type of the repository whose repository branche commit details are to be listed on GitHub",
+          "description": "Select the type of the repository whose repository branche commit details are to be listed on GitHub. You can choose from Organization or User."
+        },
+        {
+          "title": "Repository Name",
+          "name": "repo",
+          "visible": true,
+          "required": true,
+          "editable": true,
+          "type": "text",
+          "tooltip": "Specify the name of the repository whose branche commit details you want to retrieve from GitHub",
+          "description": "Specify the name of the repository whose branche commit details you want to retrieve from GitHub."
+        },
+        {
+          "title": "Reference",
+          "name": "ref",
+          "visible": true,
+          "required": true,
+          "editable": true,
+          "type": "text",
+          "tooltip": "Specify the commit reference as commit SHA, branch name, or tag name.",
+          "description": "Specify the commit reference as commit SHA, branch name, or tag name."
+        },
+        {
+          "title": "Per Page",
+          "name": "per_page",
+          "visible": true,
+          "required": false,
+          "editable": true,
+          "type": "integer",
+          "tooltip": "Specify the number of results, per page, that this operation should return. By default, this value is set as 30; and the maximum value you can specify for this parameter is 100",
+          "description": "(Optional) Specify the number of results, per page, that this operation should return. By default, this value is set to 30; and the maximum value you can specify for this parameter is 100."
+        },
+        {
+          "title": "Page",
+          "name": "page",
+          "visible": true,
+          "required": false,
+          "editable": true,
+          "type": "integer",
+          "tooltip": "Specify the page number from which you want the operation to return the results of the operation. By default, this value is set as 1",
+          "description": "(Optional) Specify the page number from which you want the operation to return the results of the operation. By default, this value is set to 1."
+        }
+      ]
+    },
+    {
+      "operation": "compare_commit",
+      "title": "Get Commit Comparison",
+      "description": "Retrieves the comparison between two commits against each other. You can compare references (branches or tags) and commit SHAs within the same repository, or across repositories within the same network (such as forks). This allows you to view changes between commits, including commits made on forked branches.",
+      "category": "investigation",
+      "annotation": "compare_commit",
+      "enabled": true,
+      "output_schema": {
+        "url": "",
+        "html_url": "",
+        "permalink_url": "",
+        "diff_url": "",
+        "patch_url": "",
+        "base_commit": {
+          "sha": "",
+          "node_id": "",
+          "commit": {
+            "author": {
+              "name": "",
+              "email": "",
+              "date": ""
+            },
+            "committer": {
+              "name": "",
+              "email": "",
+              "date": ""
+            },
+            "message": "",
+            "tree": {
+              "sha": "",
+              "url": ""
+            },
+            "url": "",
+            "comment_count": "",
+            "verification": {
+              "verified": "",
+              "reason": "",
+              "signature": "",
+              "payload": "",
+              "verified_at": ""
+            }
+          },
+          "url": "",
+          "html_url": "",
+          "comments_url": "",
+          "author": {
+            "login": "",
+            "id": "",
+            "node_id": "",
+            "avatar_url": "",
+            "gravatar_id": "",
+            "url": "",
+            "html_url": "",
+            "followers_url": "",
+            "following_url": "",
+            "gists_url": "",
+            "starred_url": "",
+            "subscriptions_url": "",
+            "organizations_url": "",
+            "repos_url": "",
+            "events_url": "",
+            "received_events_url": "",
+            "type": "",
+            "_view_type": "",
+            "site_admin": ""
+          },
+          "committer": {
+            "login": "",
+            "id": "",
+            "node_id": "",
+            "avatar_url": "",
+            "gravatar_id": "",
+            "url": "",
+            "html_url": "",
+            "followers_url": "",
+            "following_url": "",
+            "gists_url": "",
+            "starred_url": "",
+            "subscriptions_url": "",
+            "organizations_url": "",
+            "repos_url": "",
+            "events_url": "",
+            "received_events_url": "",
+            "type": "",
+            "_view_type": "",
+            "site_admin": ""
+          },
+          "parents": [
+            {
+              "sha": "",
+              "url": "",
+              "html_url": ""
+            }
+          ]
+        },
+        "merge_base_commit": {
+          "sha": "",
+          "node_id": "",
+          "commit": {
+            "author": {
+              "name": "",
+              "email": "",
+              "date": ""
+            },
+            "committer": {
+              "name": "",
+              "email": "",
+              "date": ""
+            },
+            "message": "",
+            "tree": {
+              "sha": "",
+              "url": ""
+            },
+            "url": "",
+            "comment_count": "",
+            "verification": {
+              "verified": "",
+              "reason": "",
+              "signature": "",
+              "payload": "",
+              "verified_at": ""
+            }
+          },
+          "url": "",
+          "html_url": "",
+          "comments_url": "",
+          "author": {
+            "login": "",
+            "id": "",
+            "node_id": "",
+            "avatar_url": "",
+            "gravatar_id": "",
+            "url": "",
+            "html_url": "",
+            "followers_url": "",
+            "following_url": "",
+            "gists_url": "",
+            "starred_url": "",
+            "subscriptions_url": "",
+            "organizations_url": "",
+            "repos_url": "",
+            "events_url": "",
+            "received_events_url": "",
+            "type": "",
+            "_view_type": "",
+            "site_admin": ""
+          },
+          "committer": {
+            "login": "",
+            "id": "",
+            "node_id": "",
+            "avatar_url": "",
+            "gravatar_id": "",
+            "url": "",
+            "html_url": "",
+            "followers_url": "",
+            "following_url": "",
+            "gists_url": "",
+            "starred_url": "",
+            "subscriptions_url": "",
+            "organizations_url": "",
+            "repos_url": "",
+            "events_url": "",
+            "received_events_url": "",
+            "type": "",
+            "_view_type": "",
+            "site_admin": ""
+          },
+          "parents": [
+            {
+              "sha": "",
+              "url": "",
+              "html_url": ""
+            }
+          ]
+        },
+        "status": "",
+        "ahead_by": "",
+        "behind_by": "",
+        "total_commits": "",
+        "commits": [
+          {
+            "sha": "",
+            "node_id": "",
+            "commit": {
+              "author": {
+                "name": "",
+                "email": "",
+                "date": ""
+              },
+              "committer": {
+                "name": "",
+                "email": "",
+                "date": ""
+              },
+              "message": "New PB",
+              "tree": {
+                "sha": "",
+                "url": ""
+              },
+              "url": "",
+              "comment_count": 0,
+              "verification": {
+                "verified": "",
+                "reason": "",
+                "signature": "",
+                "payload": "",
+                "verified_at": ""
+              }
+            },
+            "url": "",
+            "html_url": "",
+            "comments_url": "",
+            "author": {
+              "login": "",
+              "id": "",
+              "node_id": "",
+              "avatar_url": "",
+              "gravatar_id": "",
+              "url": "",
+              "html_url": "",
+              "followers_url": "",
+              "following_url": "",
+              "gists_url": "",
+              "starred_url": "",
+              "subscriptions_url": "",
+              "organizations_url": "",
+              "repos_url": "",
+              "events_url": "",
+              "received_events_url": "",
+              "type": "",
+              "_view_type": "",
+              "site_admin": ""
+            },
+            "committer": {
+              "login": "",
+              "id": "",
+              "node_id": "",
+              "avatar_url": "",
+              "gravatar_id": "",
+              "url": "",
+              "html_url": "",
+              "followers_url": "",
+              "following_url": "",
+              "gists_url": "",
+              "starred_url": "",
+              "subscriptions_url": "",
+              "organizations_url": "",
+              "repos_url": "",
+              "events_url": "",
+              "received_events_url": "",
+              "type": "",
+              "_view_type": "",
+              "site_admin": ""
+            },
+            "parents": [
+              {
+                "sha": "",
+                "url": "",
+                "html_url": ""
+              }
+            ]
+          }
+        ],
+        "files": [
+          {
+            "sha": "",
+            "filename": "",
+            "status": "",
+            "additions": "",
+            "deletions": "",
+            "changes": "",
+            "blob_url": "",
+            "raw_url": "",
+            "contents_url": "",
+            "patch": ""
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "title": "Repository Type",
+          "name": "repo_type",
+          "visible": true,
+          "required": true,
+          "editable": true,
+          "type": "select",
+          "options": [
+            "Organization",
+            "User"
+          ],
+          "onchange": {
+            "Organization": [
+              {
+                "title": "Organization Name",
+                "name": "org",
+                "visible": true,
+                "required": true,
+                "editable": true,
+                "type": "text",
+                "tooltip": "Specify the name of the organization on GitHub, of the repository whose repository compare commit details are to be listed, in the Organization Name field.",
+                "description": "Specify the name of the organization on GitHub, of the repository whose repository compare commit details are to be listed, in the Organization Name field."
+              }
+            ],
+            "User": [
+              {
+                "title": "Repository Owner",
+                "name": "owner",
+                "visible": true,
+                "required": true,
+                "editable": true,
+                "type": "text",
+                "tooltip": "Specify the name of the repository owner on GitHub, of the repository whose repository compare commit details are to be listed, in the Repository Owner field.",
+                "description": "Specify the name of the repository owner on GitHub, of the repository whose repository compare commit details are to be listed, in the Repository Owner field."
+              }
+            ]
+          },
+          "tooltip": "Select the type of the repository whose repository compare commit details are to be listed on GitHub.",
+          "description": "Select the type of the repository whose repository compare commit details are to be listed on GitHub. You can choose from Organization or User."
+        },
+        {
+          "title": "Repository Name",
+          "name": "repo",
+          "visible": true,
+          "required": true,
+          "editable": true,
+          "type": "text",
+          "tooltip": "Specify the name of the repository whose commit comparison you want to retrieve from GitHub",
+          "description": "Specify the name of the repository whose commit comparison you want to retrieve from GitHub"
+        },
+        {
+          "title": "Base",
+          "name": "base",
+          "visible": true,
+          "required": true,
+          "editable": true,
+          "type": "text",
+          "tooltip": "Specify the base commit SHA, branch name, or tag to compare against",
+          "description": "Specify the base commit SHA, branch name, or tag to compare against. This is the starting point of the comparison - changes in head will be shown relative to this commit or reference."
+        },
+        {
+          "title": "Head",
+          "name": "head",
+          "visible": true,
+          "required": true,
+          "editable": true,
+          "type": "text",
+          "tooltip": "Specify the commit SHA, branch name, or tag you want to compare to the base.",
+          "description": "Specify the commit SHA, branch name, or tag you want to compare to the base. This represents the newer or target commit - changes in this commit that are not in base will be shown"
+        },
+        {
+          "title": "Per Page",
+          "name": "per_page",
+          "visible": true,
+          "required": false,
+          "editable": true,
+          "type": "integer",
+          "tooltip": "Specify the number of results, per page, that this operation should return. By default, this value is set as 30; and the maximum value you can specify for this parameter is 100",
+          "description": "(Optional) Specify the number of results, per page, that this operation should return. By default, this value is set to 30; and the maximum value you can specify for this parameter is 100."
+        },
+        {
+          "title": "Page",
+          "name": "page",
+          "visible": true,
+          "required": false,
+          "editable": true,
+          "type": "integer",
+          "tooltip": "Specify the page number from which you want the operation to return the results of the operation. By default, this value is set as 1",
+          "description": "(Optional) Specify the page number from which you want the operation to return the results of the operation. By default, this value is set to 1."
+        }
+      ]
+    },
+    {
       "operation": "delete_branch",
       "title": "Delete Branch",
       "description": "Delete a new branch in GitHub based on the repository type, organization or repository owner's name, repository name, branch name, and other input parameters you have specified",
