@@ -249,6 +249,33 @@ def list_branches(config, params, *args, **kwargs):
                                org=params.get('org'), owner=params.get('owner'))
 
 
+def get_commit(config, params, *args, **kwargs):
+    github = GitHub(config)
+    query_params = {k: v for k, v in params.items() if
+                    v is not None and v != '' and v != {} and v != [] and k not in ['owner', 'org', 'repo']}
+    del query_params['ref']
+    return github.make_request(endpoint='{0}/commits/{1}'.format(params.get('repo'), params.get('ref')), params=query_params,
+                               org=params.get('org'), owner=params.get('owner'))
+
+
+def compare_commit(config, params, *args, **kwargs):
+    github = GitHub(config)
+    query_params = {
+        k: v for k, v in params.items()
+        if v not in (None, '', {}, []) and k not in ['owner', 'org', 'repo', 'base', 'head']
+    }
+    base = params.get('base')
+    head = params.get('head')
+    repo = params.get('repo')
+    endpoint = f'{repo}/compare/{base}...{head}'
+    return github.make_request(
+        endpoint=endpoint,
+        params=query_params,
+        org=params.get('org'),
+        owner=params.get('owner')
+    )
+
+
 def delete_branch(config, params, *args, **kwargs):
     github = GitHub(config)
     return github.make_request(method='DELETE', org=params.get('org'), owner=params.get('owner'),
@@ -373,79 +400,102 @@ def update_clone_repository(config, params, *args, **kwargs):
 
 
 def push_repository(config, params, *args, **kwargs):
+    # Authentication
     token = config.get('password')
     github = GitHub(config)
     g = Github(token, base_url=github.server_url.strip("/"), verify=github.verify_ssl)
+
+    # Get repository object
     if params.get('repo_type') == 'Organization':
         repo = g.get_organization(params.get('org')).get_repo(params.get('name'))
     else:
         repo = g.get_user().get_repo(params.get('name'))
-    root = params.get('clone_path')
-    file_list = []
-    local_paths = set()
-    for root, dirs, files in os.walk(root):
-        for f in files:
-            if not any(x in os.path.join(root, f) for x in ['.DS_Store', '.git']):
-                file_list.append(os.path.join(root, f))
-    commit_message = params.get('commit_message')
+
+    # Parameters
+    root_path = params.get('clone_path')
+    branch = params.get('branch', 'main')
+    commit_message = params.get('commit_message', 'Update files')
     commit_description = params.pop('commit_description', '')
     if commit_description:
         commit_message += '\n' + commit_description
-    branch = params.get('branch', 'main')
-    master_ref = repo.get_git_ref('heads/' + branch)
-    master_sha = master_ref.object.sha
-    base_tree = repo.get_git_tree(master_sha)
-    element_list = list()
-    try:
-        for entry in file_list:
-            if entry.endswith('.png'):
-                with open(entry, 'rb') as input_file:
-                    data = input_file.read()
-                    data = b64encode(data).decode() if isinstance(data, bytes) else b64encode(data.encode()).decode()
-            else:
-                with open(entry, 'r', encoding='utf-8', errors='ignore') as input_file:
-                    data = input_file.read()
-            en = entry.replace(params.get('clone_path') + '/', '')
-            element = InputGitTreeElement(en, '100644', 'blob', content=data)
-            element_list.append(element)
-            local_paths.add(en)
-    except AssertionError as err:
-        raise ConnectorError(err)
 
-    # Get all remote files in the current tree
-    def get_all_files_from_tree(tree, path=''):
+    # Get current commit/tree
+    try:
+        master_ref = repo.get_git_ref(f'heads/{branch}')
+    except Exception as e:
+        raise ConnectorError(f"Failed to fetch branch '{branch}': {e}")
+    
+    master_sha = master_ref.object.sha
+    base_tree = repo.get_git_tree(master_sha, recursive=True)
+
+    # Get all remote files
+    def get_all_files_from_tree(tree):
         file_paths = {}
-        if path:
-            path += '/'
         for element in tree.tree:
             if element.type == 'blob':
-                file_paths[path + element.path] = element.sha
-            elif element.type == 'tree':
-                sub_tree = repo.get_git_tree(element.sha)
-                file_paths.update(get_all_files_from_tree(sub_tree, path + element.path))
+                file_paths[element.path] = element.sha
         return file_paths
 
     remote_files = get_all_files_from_tree(base_tree)
     remote_paths = set(remote_files.keys())
 
-    # Identify files that need to be deleted
+    # Collect and read local files
+    element_list = []
+    local_paths = set()
+
+    try:
+        for root, dirs, files in os.walk(root_path):
+            for f in files:
+                full_path = os.path.join(root, f)
+
+                # Skip ignored files
+                if any(skip in full_path for skip in ['.DS_Store', '.git']):
+                    continue
+
+                # Relative path from root directory
+                rel_path = os.path.relpath(full_path, root_path)
+                local_paths.add(rel_path)
+
+                # Read file content
+                if rel_path.endswith('.png'):  # or any other binary extension
+                    with open(full_path, 'rb') as input_file:
+                        data = b64encode(input_file.read()).decode()
+                else:
+                    with open(full_path, 'r', encoding='utf-8', errors='ignore') as input_file:
+                        data = input_file.read()
+
+                element = InputGitTreeElement(
+                    path=rel_path,
+                    mode='100644',
+                    type='blob',
+                    content=data
+                )
+                element_list.append(element)
+    except Exception as err:
+        raise ConnectorError(f"Error reading files: {err}")
+
+    # Detect deleted files
     files_to_delete = remote_paths - local_paths
-    # Delete files that are no longer present in the local directory
-    for file_to_delete in files_to_delete:
-        element = InputGitTreeElement(file_to_delete, '100644', 'blob', sha=None)
+    for file_path in files_to_delete:
+        element = InputGitTreeElement(path=file_path, mode='100644', type='blob', sha=None)
         element_list.append(element)
-    tree = repo.create_git_tree(element_list, base_tree)
+
+    # No changes safeguard
+    if not element_list:
+        return {"status": "no changes to commit"}
+
+    # Create and commit
+    new_tree = repo.create_git_tree(element_list, base_tree)
     parent = repo.get_git_commit(master_sha)
-    commit = repo.create_git_commit(commit_message, tree, [parent])
+    commit = repo.create_git_commit(commit_message, new_tree, [parent])
     master_ref.edit(commit.sha)
-    for entry in file_list:
-        if entry.endswith('.png'):
-            with open(entry, 'rb') as input_file:
-                data = input_file.read()
-            en = entry.replace(params.get('clone_path') + '/', '')
-            old_file = repo.get_contents(en)
-            commit = repo.update_file(en, 'Update PNG content', data, old_file.sha)
-    return {"status": "finish"}
+
+    return {
+        "status": "finished",
+        "commit_sha": commit.sha,
+        "files_added_or_updated": list(local_paths),
+        "files_deleted": list(files_to_delete)
+    }
 
 
 def create_pull_request(config, params, *args, **kwargs):
@@ -709,6 +759,8 @@ operations = {
     'create_issue_comment': create_issue_comment,
     'list_repository_issue': list_repository_issue,
     'list_branches': list_branches,
+    'get_commit': get_commit,
+    'compare_commit': compare_commit,
     'fetch_upstream': fetch_upstream,
     'clone_repository': clone_repository,
     'update_clone_repository': update_clone_repository,
