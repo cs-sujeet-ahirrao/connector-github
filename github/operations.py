@@ -325,6 +325,13 @@ def clone_repository(config, params, *args, **kwargs):
             return {"path": zip_file}
         else:
             unzip_file_path = '/tmp/{0}-{1}'.format(params.get('name'), params.get('branch'))
+            if os.path.exists(unzip_file_path):
+                # If it's a file, delete it
+                if os.path.isfile(unzip_file_path):
+                    os.remove(unzip_file_path)
+                # If it's a folder, delete it and its contents
+                elif os.path.isdir(unzip_file_path):
+                    shutil.rmtree(unzip_file_path)
             with zipfile.ZipFile(zip_file, "r") as zip_ref:
                 zip_ref.extractall(settings.TMP_FILE_ROOT)
             save_file_in_env(env, unzip_file_path)
