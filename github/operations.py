@@ -289,62 +289,86 @@ def fetch_upstream(config, params, *args, **kwargs):
                                method='POST', org=params.get('org'), owner=params.get('owner'))
 
 
+def delete_if_exists(path):
+    if os.path.exists(path):
+        if os.path.isfile(path):
+            os.remove(path)
+        elif os.path.isdir(path):
+            shutil.rmtree(path)
+        logger.info(f"Deleted existing path: {path}")
+
+
 def clone_repository(config, params, *args, **kwargs):
     try:
         github = GitHub(config)
         env = kwargs.get('env', {})
-        url = "https://{0}:{1}@{2}/{3}/{4}/zip/refs/heads/{5}".format(config.get('username'),
-                                                                      config.get('password'),
-                                                                      github.clone_url.split('//')[-1],
-                                                                      params.get('org') if params.get(
-                                                                          'repo_type') == "Organization" else params.get(
-                                                                          'owner'),
-                                                                      params.get('name'),
-                                                                      params.get(
-                                                                          'branch') if params.get(
-                                                                          'branch') else "main")
+
+        # Basic repo details
+        repo_owner = params.get('org') if params.get('repo_type') == "Organization" else params.get('owner')
+        repo_name = params.get('name')
+        branch = params.get('branch') or "main"
+        safe_branch = branch.replace('/', '-')
+        timestamp = datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')
+
+        # Build ZIP download URL
+        base_url = github.clone_url.split('//')[-1]
+        url = f"https://{config.get('username')}:{config.get('password')}@{base_url}/{repo_owner}/{repo_name}/zip/refs/heads/{branch}"
+
+        # Prepare paths
+        archive_name = f"github-{repo_name}-{timestamp}.zip"
+        zip_path = os.path.join("/tmp", archive_name)
+        unzip_dir = os.path.join("/tmp", f"{repo_name}-{safe_branch}")
+
+        # Clean previous versions
+        delete_if_exists(zip_path)
+        delete_if_exists(unzip_dir)
+
+        # Download ZIP archive
         headers = CLONE_ACCEPT_HEADER
-        zip_file = '/tmp/github-{0}-{1}.zip'.format(params.get('name'), datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f'))
-        response = requests.request("GET", url, headers=headers, data={}, verify=config.get('verify_ssl'))
+        response = requests.get(url, headers=headers, verify=config.get('verify_ssl', True))
+
         if not response.ok:
-            logger.error("Error occurred: {{\"status_code\": {0}, Error: {1}}}".format(response.status_code,
-                                                                                       response.text if response.text else response.content))
-            raise ConnectorError("Error occurred: {{\"status_code\": {0}, Error: {1}}}".format(response.status_code,
-                                                                                               response.text if response.text else response.content))
-        if os.path.exists(zip_file):
-            # If it's a file, delete it
-            if os.path.isfile(zip_file):
-                os.remove(zip_file)
-            # If it's a folder, delete it and its contents
-            elif os.path.isdir(zip_file):
-                shutil.rmtree(zip_file)
-        with open(zip_file, "wb") as zipFile:
-            zipFile.write(response.content)
+            logger.error(f"GitHub clone failed: {{status_code: {response.status_code}, error: {response.text}}}")
+            raise ConnectorError(f"GitHub clone failed: {{status_code: {response.status_code}, error: {response.text}}}")
+
+        # Write ZIP archive
+        with open(zip_path, "wb") as f:
+            f.write(response.content)
+            logger.info(f"Repository archive saved to: {zip_path}")
+
+        # If just ZIP is needed
         if params.get('clone_zip') is True:
-            save_file_in_env(env, zip_file)
-            return {"path": zip_file}
-        else:
-            unzip_file_path = '/tmp/{0}-{1}'.format(params.get('name'), params.get('branch'))
-            if os.path.exists(unzip_file_path):
-                # If it's a file, delete it
-                if os.path.isfile(unzip_file_path):
-                    os.remove(unzip_file_path)
-                # If it's a folder, delete it and its contents
-                elif os.path.isdir(unzip_file_path):
-                    shutil.rmtree(unzip_file_path)
-            with zipfile.ZipFile(zip_file, "r") as zip_ref:
-                zip_ref.extractall(settings.TMP_FILE_ROOT)
-            save_file_in_env(env, unzip_file_path)
-            save_file_in_env(env, zip_file)
-            return {"path": unzip_file_path}
+            save_file_in_env(env, zip_path)
+            return {"path": zip_path}
+
+        # Else, extract and return folder path
+        extract_root = getattr(settings, 'TMP_FILE_ROOT', '/tmp')
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            zip_ref.extractall(extract_root)
+            logger.info(f"Archive extracted to: {extract_root}")
+
+        # GitHub ZIPs typically unpack to a folder like `repo-branch`
+        extracted_root_folder = os.path.join(extract_root, f"{repo_name}-{branch}")
+
+        if os.path.exists(extracted_root_folder):
+            shutil.move(extracted_root_folder, unzip_dir)
+            logger.info(f"Moved extracted folder to: {unzip_dir}")
+
+        save_file_in_env(env, unzip_dir)
+        save_file_in_env(env, zip_path)
+
+        return {"path": unzip_dir}
+
     except ConnectorError as e:
         raise ConnectorError(e)
+
     except Exception as e:
         error = str(e)
-        if config.get('password') in error:
-            e = error.replace(config.get('password'), config.get('password')[:4] + '******************')
-        raise ConnectorError(e)
-
+        password = config.get('password')
+        if password and password in error:
+            error = error.replace(password, password[:4] + '******************')
+        raise ConnectorError(error)
+    
 
 def unzip_protected_file(file_iri=None, *args, **kwargs):
     try:
