@@ -3900,8 +3900,9 @@
           "required": true,
           "editable": true,
           "type": "text",
-          "tooltip": "Specify the base commit SHA, branch name, or tag to compare against",
-          "description": "Specify the base commit SHA, branch name, or tag to compare against. This is the starting point of the comparison - changes in head will be shown relative to this commit or reference."
+          "placeholder": "baseBranchName or username:baseBranchName",
+          "tooltip": "Specify the base branch name (BASE) from the same repository, or use the format USERNAME:BASE to reference a branch from a different repository for comparison.",
+          "description": "Specify the base branch name (BASE) from the same repository, or use the format USERNAME:BASE to reference a branch from a different repository for comparison."
         },
         {
           "title": "Head",
@@ -3910,8 +3911,9 @@
           "required": true,
           "editable": true,
           "type": "text",
-          "tooltip": "Specify the commit SHA, branch name, or tag you want to compare to the base.",
-          "description": "Specify the commit SHA, branch name, or tag you want to compare to the base. This represents the newer or target commit - changes in this commit that are not in base will be shown"
+          "placeholder": "headBranchName or username:headBranchName",
+          "tooltip": "Specify the head branch name (HEAD) from the same repository, or use the format USERNAME:HEAD to reference a branch from a different repository for comparison.",
+          "description": "Specify the head branch name (HEAD) from the same repository, or use the format USERNAME:HEAD to reference a branch from a different repository for comparison."
         },
         {
           "title": "Per Page",
