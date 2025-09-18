@@ -106,7 +106,7 @@
           "playbookOrigin": "/api/3/picklists/15c1e8c9-22bf-4e66-8fbb-0a502d4a4a3f",
           "isEditable": true,
           "uuid": "03840321-b960-40a3-860c-17e174fa1c78",
-          "id": 349,
+          "id": 350,
           "owners": [],
           "isPrivate": false,
           "deletedAt": null,
@@ -2380,7 +2380,8 @@
           "remoteExecutableFlag": false,
           "parameters": [
             "connector_config_id",
-            "update_issue_params"
+            "update_issue_params",
+            "issue_contents"
           ],
           "synchronous": false,
           "lastModifyDate": 1755774328,
@@ -2415,7 +2416,7 @@
                 "config": "{{vars.input.params['connector_config_id']}}",
                 "params": {
                   "org": "{{vars.input.params['update_issue_params']['org_name']}}",
-                  "body": "{{vars.input.params['update_issue_params']['contents']}}",
+                  "body": "{{vars.input.params['issue_contents']}}",
                   "repo": "{{vars.input.params['update_issue_params']['repo_name']}}",
                   "state": "{{vars.input.params['update_issue_params']['state']}}",
                   "title": "",
