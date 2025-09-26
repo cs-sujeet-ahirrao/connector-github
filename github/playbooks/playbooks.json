@@ -946,7 +946,7 @@
               "name": "Set Result",
               "description": null,
               "arguments": {
-                "data": "{% if vars.input.params['list_pr_params']['pull_number'] %}\n{% set _ = vars.result.update({\"reviewer_names\": [vars.result.requested_reviewers.login] if vars.result.requested_reviewers else []})%}\n{% else %}{% for pr in vars.result%}{% set _ = pr.update({\"reviewer_names\": pr.requested_reviewers | json_query(\"[].login[]\")})%}{% endfor %}{% endif %}{{vars.result | toDict}}"
+                "data": "{% if vars.input.params['list_pr_params']['pull_number'] %}{% set reviewers = vars.result.requested_reviewers | default([]) %}{% set reviewer_names = reviewers | map(attribute='login') | list %}{% set _ = vars.result.update({\"reviewer_names\": reviewer_names}) %}{% else %}{% for pr in vars.result %}{% set reviewers = pr.requested_reviewers | default([]) %}{% set reviewer_names = reviewers | map(attribute='login') | list %}{% set _ = pr.update({\"reviewer_names\": reviewer_names}) %}{% endfor %}\n{% endif %}{{ vars.result }}"
               },
               "status": null,
               "top": "300",
@@ -4870,7 +4870,7 @@
               "name": "Save Result",
               "description": null,
               "arguments": {
-                "data": "{% if vars.steps.Fetch_Release.data | length > 0 %}\n{{(vars.steps.Fetch_Release.data | json_query(\"[?name=='\"+(vars.input.params[\"fetch_release_params\"][\"release_name\"])+\"']\"))[0]}}\n{% endif %}"
+                "data": "{% if vars.steps.Fetch_Release.data | length > 0 %}{{(vars.steps.Fetch_Release.data | json_query(\"[?name=='\"+(vars.input.params[\"fetch_release_params\"][\"release_name\"])+\"']\"))[0]}}{% endif %}"
               },
               "status": null,
               "top": "300",
